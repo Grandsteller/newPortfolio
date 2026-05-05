@@ -95,22 +95,38 @@ const skillObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 document.querySelectorAll('.skill-category').forEach(el => skillObserver.observe(el));
 
+/* ── EMAILJS INIT ── */
+emailjs.init('7WmlmkB4PpZ4CgS5h');
+
 /* ── CONTACT FORM ── */
 function handleSubmit(e) {
   e.preventDefault();
   const btn = e.target.querySelector('.btn-send');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
   btn.disabled = true;
-  setTimeout(() => {
-    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
-    btn.disabled = false;
-    e.target.reset();
-    showToast();
-  }, 1800);
+
+  emailjs.sendForm('service_oqcxhs8', 'template_3uki52n', e.target)
+    .then(() => {
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+      btn.disabled = false;
+      e.target.reset();
+      showToast(true);
+    }, () => {
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+      btn.disabled = false;
+      showToast(false);
+    });
 }
 
-function showToast() {
+function showToast(success) {
   const toast = document.getElementById('toast');
+  if (success) {
+    toast.innerHTML = '<i class="fas fa-check-circle"></i> Message sent! I\'ll get back to you shortly.';
+    toast.style.background = '';
+  } else {
+    toast.innerHTML = '<i class="fas fa-times-circle"></i> Failed to send. Please try again.';
+    toast.style.background = '#e74c3c';
+  }
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 4000);
 }
